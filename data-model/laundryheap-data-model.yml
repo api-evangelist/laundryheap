@@ -1,0 +1,183 @@
+generated: '2026-08-23'
+method: derived
+source: >-
+  graphql/laundryheap-graphql.yml — derived from the 69 GraphQL fields and their
+  argument types extracted from Laundryheap's published production client bundle.
+description: >-
+  The entity graph implied by Laundryheap's GraphQL surface. Derived, not read:
+  introspection is disabled and no schema is published, so entities and edges are
+  inferred from argument names, argument types and the fields that co-occur in
+  the company's own client operations. Types named in ALL CAPS of the GraphQL
+  argument syntax (ServiceCountryEnum, OrderStateEnumType, ...) are real — they
+  appear verbatim in the published operations. Return-side fields are NOT
+  modelled, because nothing published defines them.
+confidence: medium
+confidence_note: >-
+  High confidence in the entities and in every relationship carried by an
+  observed argument (e.g. createOrder taking an addressId proves Order belongs_to
+  Address). Lower confidence in cardinality, which is inferred from plural vs
+  singular field naming.
+
+entities:
+  - name: User
+    fields_observed: [firstName, lastName, phone, email, serviceCountry, companyUser]
+    operations: [me, updateUser, createGuestUser, verifyMagicLink, authorize, checkEmailTypos, isEmailTaken, isPhoneTaken, isPhoneTakenWithEmailV2]
+    note: A guest user can be created without a password (createGuestUser), then upgraded.
+  - name: Address
+    fields_observed: [city, country, countryCode, latitude, longitude, isDefault, udprn, addressType]
+    operations: [addresses, createAddress, updateAddress, validateAddressWithMappedCity]
+    note: >-
+      Geocoded (lat/lng required on create and update) and validated against a
+      city mapping. `udprn` is the Royal Mail Unique Delivery Point Reference
+      Number — a UK-specific address identifier.
+  - name: Order
+    identifier: uuid (String)
+    operations: [order, ordersV2, createOrder, modifyOrder, cancelOrder, updateOrderServices, getPaymentPolicy, sendInvoiceMail]
+    state_enum: OrderStateEnumType
+    sort_enum: OrderSortEnum
+    fields_observed: [pickupAfterDateTime, pickupBeforeDateTime, dropOffAfterDateTime, dropOffBeforeDateTime, dropoffMethod]
+    note: >-
+      Identified by an opaque uuid string, not a numeric id. Carries a four-part
+      time window — a pickup window and a dropoff window, each with an after and
+      a before bound.
+  - name: RepeatOrder
+    identifier: uuid (String)
+    operations: [repeatOrder, repeatOrders, repeatOrderUpdate, repeatOrderUpdateSchedule, repeatOrderDelete, repeatOrderTimeslots]
+    note: A recurring-order template, scheduled separately from the Orders it generates.
+  - name: Service
+    identifier: short_code
+    operations: [services, updateOrderServices, getExpressOrderInfo]
+    input_type: OrderServiceInput
+    known_values: [mixed_wash, separate_wash, wash_and_iron, dry_cleaning, ironing, duvets_bulky_items, repairs]
+    note: >-
+      Confirmed independently against the live REST endpoint
+      /api/v1/services?address=London, saved at
+      examples/laundryheap-services-response.json.
+  - name: Timeslot
+    operations: [timeslotsV2, repeatOrderTimeslots]
+    type_enum: AvailabilityTypeEnumType
+    fields_observed: [pickupAfterTime, pickupBeforeTime, dropoffAfterTime, dropoffBeforeTime, serviceIds]
+  - name: ServiceCountry
+    identifier: ServiceCountryEnum
+    operations: [serviceCountries, countries, city, globalNotice]
+    note: >-
+      The single most pervasive argument in the whole API — ServiceCountryEnum
+      appears on 14 separate fields. Country is the primary partition key of the
+      entire data model.
+  - name: City
+    operations: [city, globalNotice, validateAddressWithMappedCity]
+  - name: Hotel
+    operations: [hotels]
+    filter_type: HotelFilterInputType
+    note: >-
+      The B2B surface. Hotels are first-class entities queried by service country
+      with a structured filter, matching the hotel-affiliate programme the
+      marketing site advertises.
+  - name: Subscription
+    identifier: SubscriptionShortCodeEnum
+    operations: [subscriptions, createSubscription, updateSubscription, redeemSubscriptionCode]
+    note: No cancel mutation is exposed on this surface.
+  - name: Bundle
+    operations: [bundles, bundleGroups, purchasedBundles, purchaseBundle]
+    fields_observed: [bundleId]
+    note: Prepaid packs, grouped into bundleGroups.
+  - name: Credit
+    operations: [creditsInfo, creditTransactions, buyCredits, claimCredits, userBenefits]
+    input_types: [BuyInput, ClaimInput]
+    note: A wallet with a transaction ledger (creditTransactions is paginated).
+  - name: Promotion
+    operations: [promotionCards, validPromotion, applyPromoCode, removePromoCode]
+    fields_observed: [promoCode]
+    note: Applied to and removed from a specific Order by uuid.
+  - name: PaymentMethod
+    operations: [creditCards, setDefaultCreditCard, createStripeCustomer, createSetupIntent, attachPaymentMethod, getPaymentInfo, stripePublishableKey]
+    processor: Stripe
+    note: >-
+      Stripe SetupIntent flow. Laundryheap stores a Stripe customer and payment
+      method reference, not card data.
+  - name: Review
+    operations: [postServiceReview, postDriverPickupReview]
+    enums: [ServiceReviewStepEnum, ServiceReviewOptionEnum, OrderDriverPickupReviewStepEnum, OrderDriverPickupReviewOptionEnum]
+    note: >-
+      Two separate review entities — one for the cleaning service, one for the
+      driver pickup — each a multi-step survey with enumerated options.
+  - name: Device
+    operations: [createUserDeviceInfo]
+    enums: [DeviceOsEnum, DeviceIdTypeEnum]
+    note: Device registration, presumably for push notifications.
+  - name: GlobalSetting
+    operations: [globalSettings, globalNotice, appInit, getCloudFrontInfo, mobileAppUrl]
+    note: >-
+      Confirmed as a real GraphQL type by the server itself — querying
+      globalSettings without a selection set returns "field 'globalSettings'
+      returns GlobalSetting".
+
+relationships:
+  - {from: Order, to: Address, type: belongs_to, via: addressId}
+  - {from: Order, to: User, type: belongs_to, via: authenticated session}
+  - {from: Order, to: Service, type: has_many, via: 'services: [OrderServiceInput]'}
+  - {from: Order, to: Timeslot, type: has_one, via: pickup/dropoff datetime windows}
+  - {from: Order, to: Promotion, type: has_one, via: promoCode + order uuid}
+  - {from: Order, to: PaymentMethod, type: belongs_to, via: getPaymentPolicy / getPaymentInfo}
+  - {from: Order, to: Review, type: has_many, via: 'uuid on postServiceReview and postDriverPickupReview'}
+  - {from: RepeatOrder, to: Address, type: belongs_to, via: addressId}
+  - {from: RepeatOrder, to: Service, type: has_many, via: serviceIds}
+  - {from: RepeatOrder, to: Order, type: has_many, via: generated occurrences (inferred)}
+  - {from: User, to: Address, type: has_many, via: addresses}
+  - {from: User, to: PaymentMethod, type: has_many, via: creditCards}
+  - {from: User, to: Subscription, type: has_many, via: subscriptions}
+  - {from: User, to: Bundle, type: has_many, via: purchasedBundles}
+  - {from: User, to: Credit, type: has_one, via: creditsInfo}
+  - {from: Credit, to: CreditTransaction, type: has_many, via: creditTransactions (paginated)}
+  - {from: Address, to: City, type: belongs_to, via: validateAddressWithMappedCity}
+  - {from: City, to: ServiceCountry, type: belongs_to, via: serviceCountry}
+  - {from: Service, to: ServiceCountry, type: scoped_by, via: 'services(serviceCountry, latitude, longitude)'}
+  - {from: Timeslot, to: Service, type: scoped_by, via: serviceIds}
+  - {from: Hotel, to: ServiceCountry, type: scoped_by, via: 'hotels(serviceCountry!)'}
+  - {from: Bundle, to: BundleGroup, type: belongs_to, via: bundleGroups}
+  - {from: User, to: Device, type: has_many, via: createUserDeviceInfo}
+
+identifier_scheme:
+  Order: uuid (opaque String)
+  RepeatOrder: uuid (opaque String)
+  Address: ID
+  City: ID
+  Bundle: 'Int (bundleId)'
+  Service: 'short_code (String enum) and numeric serviceIds'
+  Subscription: SubscriptionShortCodeEnum
+  note: >-
+    Inconsistent. Orders use uuids, addresses and cities use ID, bundles use a
+    raw Int, and services are addressed by short_code in one place and numeric id
+    in another.
+
+enums_observed:
+  - ServiceCountryEnum
+  - OrderStateEnumType
+  - OrderSortEnum
+  - SortDirectionEnum
+  - AvailabilityTypeEnumType
+  - ExpressOrderEnumType
+  - SubscriptionShortCodeEnum
+  - ServiceReviewStepEnum
+  - ServiceReviewOptionEnum
+  - OrderDriverPickupReviewStepEnum
+  - OrderDriverPickupReviewOptionEnum
+  - DeviceOsEnum
+  - DeviceIdTypeEnum
+
+input_types_observed:
+  - OrderServiceInput
+  - OrderCancelReasonInput
+  - IdWithQtyInput
+  - BuyInput
+  - ClaimInput
+  - ContactUsInput
+  - UpdateScheduleInput
+  - HotelFilterInputType
+  - SetPersonaSurveyType
+  - SimpleObject
+
+coverage:
+  entities: 17
+  relationships: 23
+  source_fields: 69

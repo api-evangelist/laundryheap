@@ -1,0 +1,83 @@
+generated: '2026-08-23'
+method: probed
+source: >-
+  Live probes of Laundryheap's hosts and the operation set published in
+  https://app.laundryheap.com/assets/index-BQ9DuQOF.js (2026-08-23).
+description: >-
+  Laundryheap publishes no versioning policy, no deprecation policy, no SLA and
+  no status page. What versioning it does practise is visible only in the shape
+  of its own GraphQL field names.
+
+versioning:
+  scheme: additive field suffixes (GraphQL); uri-path (REST)
+  current: unversioned /graphql; /api/v1 for the REST surface
+  docs: null
+  policy_published: false
+  evidence: >-
+    ordersV2, timeslotsV2 and isPhoneTakenWithEmailV2 coexist with unsuffixed
+    predecessors in the published client. New behaviour is shipped as a new
+    field rather than a breaking change to the old one — an additive strategy
+    that is good practice, but it is a practice, not a published policy.
+
+deprecation:
+  policy_url: null
+  policy_published: false
+  sunset_header: false
+  deprecation_header: false
+  observed: >-
+    No Sunset or Deprecation response header on any probed endpoint. GraphQL
+    supports @deprecated on fields, but introspection is disabled so no
+    deprecation metadata is readable by a client.
+  superseded_fields:
+    - field: orders
+      superseded_by: ordersV2
+      formally_deprecated: false
+    - field: isPhoneTaken
+      superseded_by: isPhoneTakenWithEmailV2
+      formally_deprecated: false
+    - note: >-
+        timeslotsV2 has no unsuffixed sibling in the current bundle; its
+        predecessor has already been removed from the client.
+
+sla:
+  url: null
+  uptime_target: null
+  published: false
+
+status_page:
+  url: null
+  published: false
+  probes:
+    - url: https://status.laundryheap.com
+      status: 000
+      note: does not resolve (no DNS record)
+    - url: https://www.laundryheap.com/status
+      status: 200
+      note: soft-404 — redirects to the homepage with ?clear_country_cookie=true
+
+changelog:
+  url: null
+  published: false
+  note: >-
+    No dated API changelog, release-notes page or developer blog exists. The
+    consumer blog at https://www.laundryheap.com/blog/ is marketing content and
+    carries no API change history.
+
+support:
+  developer_channel: null
+  note: >-
+    There is no developer support channel. The Help Centre routes all order
+    issues into the mobile app and explicitly declines to offer phone or email
+    support. Business/partnership enquiries go to collaborate@laundryheap.com.
+
+deprecated_operations: []
+
+gaps:
+  - No status page.
+  - No deprecation policy and no Sunset/Deprecation headers.
+  - No API changelog.
+  - No SLA.
+  - Superseded GraphQL fields are left in place without @deprecated metadata a client could read.
+
+x-evidence:
+  fetched: '2026-08-23'

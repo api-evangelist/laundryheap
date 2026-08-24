@@ -1,0 +1,203 @@
+generated: '2026-08-23'
+method: probed
+source: >-
+  Live probes of https://www.laundryheap.com/graphql and /api/v1/* (2026-08-23),
+  the production web-app bundle at
+  https://app.laundryheap.com/assets/index-BQ9DuQOF.js, and the Laundryheap Help
+  Centre at https://help.laundryheap.com/.
+description: >-
+  Cross-cutting runtime semantics for Laundryheap's API surfaces. There is no
+  developer documentation to read, so every convention below was either observed
+  on a live response or read out of Laundryheap's own published client bundle.
+  Where a convention is simply absent, that is recorded as absent rather than
+  guessed at.
+
+base_urls:
+  graphql: https://www.laundryheap.com/graphql
+  rest_v1: https://www.laundryheap.com/api/v1
+  oauth: https://www.laundryheap.com/oauth
+api_style: >-
+  GraphQL-primary. A small unauthenticated JSON/REST surface at /api/v1 serves
+  the marketing site; the product itself is GraphQL.
+
+authentication:
+  scheme: OAuth 2.0 / OIDC (authorization_code + PKCE, client_credentials); first-party session cookie for the web app
+  scopes: [openid, orders.create]
+  detail: authentication/laundryheap-authentication.yml
+  scopes_detail: scopes/laundryheap-scopes.yml
+
+idempotency:
+  supported: unknown
+  state: undocumented
+  evidence: >-
+    No Idempotency-Key or equivalent header appears anywhere in the published web
+    bundle, no idempotency parameter appears on any of the 33 mutations extracted
+    from it, and no response header advertised one. Laundryheap publishes no
+    documentation that would state otherwise. Recorded as undocumented rather
+    than unsupported: absence of evidence on a closed surface is not evidence of
+    absence.
+  note: >-
+    This matters more here than on a read API. createOrder, buyCredits,
+    purchaseBundle, createSubscription and attachPaymentMethod are all
+    money-moving mutations with no observable replay protection.
+
+pagination:
+  style: page-number
+  evidence: >-
+    Observed in the client bundle. ordersV2 takes $page: Int, $perPage: Int,
+    $sortBy: OrderSortEnum, $sortDirection: SortDirectionEnum;
+    creditTransactions takes $page: Int.
+  request_params:
+    page: 1-based page index
+    perPage: page size
+    sortBy: OrderSortEnum
+    sortDirection: SortDirectionEnum
+  response_fields: unknown — the schema is not published and introspection is disabled
+  cursor_support: false
+
+field_expansion:
+  supported: na
+  note: GraphQL selection sets make field expansion moot; the client asks for what it needs.
+
+metadata:
+  supported: unknown
+  note: No arbitrary key-value metadata argument was observed on any mutation.
+
+request_tracing:
+  request_id_header: x-request-id
+  observed: 'x-request-id: 2f986456-be2a-472a-b909-636f676f1f1a on every response, GraphQL and REST alike'
+  timing_header: x-runtime
+  note: >-
+    Standard Rails instrumentation. Useful to quote to support, though
+    Laundryheap publishes no support channel that accepts it — the Help Centre
+    routes all order issues into the mobile app.
+
+versioning:
+  scheme: none at the transport layer; per-field suffixes in the schema
+  evidence: >-
+    The GraphQL endpoint is unversioned (/graphql). Versioning is done by adding
+    a new field beside the old one — ordersV2, timeslotsV2,
+    isPhoneTakenWithEmailV2 all coexist with unsuffixed predecessors. The REST
+    surface is path-versioned at /api/v1.
+  current: unversioned GraphQL; /api/v1 for REST
+  version_header: none observed
+  detail: lifecycle/laundryheap-lifecycle.yml
+
+error_envelope:
+  count: 4
+  summary: >-
+    Four distinct envelopes across one hostname — GraphQL errors[], a generic
+    REST router 404, a different REST application 404, and RFC 6749 OAuth errors.
+    None is RFC 9457.
+  detail: errors/laundryheap-problem-types.yml
+
+rate_limit_signaling:
+  headers: none
+  observed: >-
+    Twelve consecutive unauthenticated POSTs to /graphql all returned 200 with no
+    RateLimit-*, X-RateLimit-* or Retry-After header on any response.
+  detail: rate-limits/laundryheap-rate-limits.yml
+
+cors:
+  graphql: 'access-control-allow-origin: *; methods GET, POST, OPTIONS; max-age 7200'
+  note: The GraphQL endpoint is open to any origin.
+
+transport_security:
+  hsts: 'strict-transport-security: max-age=63072000; includeSubDomains'
+  detail: security/laundryheap-domain-security.yml
+
+dry_run_mode:
+  supported: false
+  state: absent
+  note: >-
+    No rehearsal or preview mutation was observed. The closest surfaces are read
+    queries that price a prospective order (getPaymentInfo, timeslotsV2,
+    services), which let a client compute an order before committing it, but
+    there is no dry-run flag on createOrder itself.
+
+reversibility:
+  state: verified
+  summary: >-
+    Laundryheap ships a real reversal path AND publishes the window it works in,
+    which is the strongest grade this dimension awards. An agent that books an
+    order can find out, before it acts, exactly how long it has to take the
+    booking back and what happens if it misses that window.
+  write_surfaces:
+    - surface: orders
+      write_operations: [createOrder, modifyOrder, updateOrderServices, applyPromoCode, removePromoCode]
+      reversal_operation: cancelOrder
+      reversal_arguments:
+        uuid: 'String — the order uuid'
+        reasons: '[OrderCancelReasonInput] — structured cancellation reasons'
+      window: >-
+        Up to 2 hours before the scheduled collection or delivery, at no extra
+        cost. A cancellation submitted inside the 2-hour window still succeeds
+        but a fee is added to the invoice.
+      window_source: https://help.laundryheap.com/en/articles/6265252-what-if-i-need-to-change-my-delivery-preferences-or-cancel-my-order
+      window_quote: >-
+        "We offer the option to make delivery changes or cancel your order up to
+        2 hours before the delivery/collection at no extra cost. However, please
+        keep in mind if the request to cancel is submitted within 2 hours of the
+        collection, a fee will be added to your invoice."
+      grade: verified
+    - surface: recurring orders
+      write_operations: [repeatOrderUpdate, repeatOrderUpdateSchedule]
+      reversal_operation: repeatOrderDelete
+      reversal_arguments:
+        uuid: 'String!'
+      window: >-
+        Not stated. Deleting a repeat order stops future occurrences; whether an
+        already-scheduled occurrence inside the 2-hour window is also cancelled
+        is not documented.
+      window_source: null
+      grade: documented
+    - surface: promotions
+      write_operations: [applyPromoCode]
+      reversal_operation: removePromoCode
+      reversal_arguments:
+        uuid: 'String!'
+      window: Not stated; presumed bounded by the order's own cancellation window.
+      window_source: null
+      grade: documented
+  irreversible_writes:
+    - operation: buyCredits
+      note: >-
+        No reversal mutation exists. claimCredits is a redemption, not a refund.
+        No refund window is published.
+    - operation: purchaseBundle
+      note: No reversal mutation observed.
+    - operation: postServiceReview
+      note: No edit or delete mutation observed.
+    - operation: postDriverPickupReview
+      note: No edit or delete mutation observed.
+  subscriptions:
+    write_operations: [createSubscription, updateSubscription, redeemSubscriptionCode]
+    reversal_operation: null
+    note: >-
+      updateSubscription changes the plan and payment method but no cancel
+      mutation appears in the published client. Subscription cancellation is not
+      exposed on this surface.
+    grade: absent
+  reimbursement:
+    note: >-
+      A separate, human, non-API path exists for quality complaints — submitted
+      in the mobile app only, within 48 hours of delivery, reviewed case by case.
+      This is a remedy, not an API reversal.
+    source: https://help.laundryheap.com/en/
+
+cross_links:
+  errors: errors/laundryheap-problem-types.yml
+  lifecycle: lifecycle/laundryheap-lifecycle.yml
+  authentication: authentication/laundryheap-authentication.yml
+  scopes: scopes/laundryheap-scopes.yml
+  rate_limits: rate-limits/laundryheap-rate-limits.yml
+  graphql: graphql/laundryheap-graphql.yml
+
+x-evidence:
+  fetched: '2026-08-23'
+  probes:
+    - url: https://www.laundryheap.com/graphql
+      method: OPTIONS
+      status: 200
+    - url: https://help.laundryheap.com/en/articles/6265252-what-if-i-need-to-change-my-delivery-preferences-or-cancel-my-order
+      status: 200

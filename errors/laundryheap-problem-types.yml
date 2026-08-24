@@ -1,0 +1,118 @@
+generated: '2026-08-23'
+method: probed
+source: >-
+  Live unauthenticated probes of https://www.laundryheap.com/graphql,
+  /api/v1/*, and /oauth/* on 2026-08-23. Laundryheap publishes no error
+  reference; every envelope and code below was observed on a real response.
+description: >-
+  Laundryheap returns four DIFFERENT error envelopes across one company and one
+  hostname, none of them RFC 9457. An integrator has to write four parsers.
+  Recorded here as observed, because there is no published error reference to
+  read instead.
+format: proprietary
+rfc9457: false
+rfc9457_note: >-
+  No response on any surface used application/problem+json, a `type` URI, or the
+  RFC 9457 member names. All error bodies are application/json.
+
+envelopes:
+  - id: graphql
+    surface: POST /graphql
+    transport_status: 200
+    media_type: application/json
+    shape: '{"errors":[{"message":"...","locations":[...],"path":[...],"extensions":{"code":"...","short_code":"..."}}],"data":{...}}'
+    note: >-
+      Spec-correct GraphQL error handling — transport 200, errors[] array. Two
+      different discriminators appear: `extensions.code` for schema/validation
+      errors and `extensions.short_code` (also duplicated at the top level of the
+      error object) for application errors.
+    observed_codes:
+      - code: undefinedField
+        example_message: "Field '__schema' doesn't exist on type 'Query'"
+        meaning: Field is not in the schema. Introspection fields return this.
+      - code: selectionMismatch
+        example_message: "Field must have selections (field 'countries' returns Country but has no selections...)"
+        meaning: A composite type was requested without a selection set.
+      - short_code: authentication
+        example_message: Authentication needed
+        meaning: The field requires an authenticated session or token.
+        remediation: Authenticate via the OAuth server or the magic-link/social sign-in flow.
+
+  - id: rest-router
+    surface: GET /api/v1/<unknown>
+    transport_status: 404
+    media_type: application/json; charset=UTF-8
+    shape: '{"status":404,"error":"Not Found"}'
+    note: >-
+      The generic router miss. Numeric `status`, human `error`, no machine code.
+
+  - id: rest-application
+    surface: GET /api/v1/services, GET /api/v1/pricing
+    transport_status: 404
+    media_type: application/json; charset=utf-8
+    shape: '{"code":"not_found","message":"Address not found"}'
+    note: >-
+      A DIFFERENT envelope from rest-router, on the same host, at the same path
+      prefix, for the same HTTP status. `code` is a machine-readable snake_case
+      string and `message` is human text. This envelope indicates the endpoint
+      EXISTS and rejected the arguments; the rest-router envelope indicates the
+      endpoint does not exist. The distinction is undocumented and is the only
+      reliable way to tell a real /api/v1 endpoint from a missing one.
+    observed_codes:
+      - code: not_found
+        message: Address not found
+        meaning: No serviceable address matched the `address` parameter.
+        remediation: Pass a resolvable address string (e.g. address=London).
+
+  - id: oauth
+    surface: POST /oauth/*
+    transport_status: 400, 403
+    media_type: application/json
+    shape: '{"error":"...","error_description":"..."}'
+    spec: RFC 6749 section 5.2
+    note: The only surface whose errors follow a published standard.
+    observed_codes:
+      - code: invalid_request
+        message: 'Missing required parameter: grant_type.'
+        status: 400
+        source_endpoint: /oauth/token
+      - code: invalid_request
+        message: Request need to be authorized. Required parameter for authorizing request is missing or invalid.
+        status: 400
+        source_endpoint: /oauth/introspect
+      - code: invalid_client_params
+        message: Name can't be blank, Redirect URI can't be blank
+        status: 400
+        source_endpoint: /oauth/registration
+        note: Not an RFC 6749 registered code; RFC 7591 defines invalid_client_metadata for this case.
+      - code: unauthorized_client
+        message: You are not authorized to revoke this token
+        status: 403
+        source_endpoint: /oauth/revoke
+
+problems: []
+problems_note: >-
+  Left empty deliberately. RFC 9457 problem types cannot be derived where no
+  OpenAPI exists and no problem+json response was observed; the real envelopes
+  are recorded above instead of inventing types Laundryheap does not publish.
+
+gaps:
+  - No published error reference of any kind.
+  - Four envelopes across one host; no shared error contract.
+  - The two /api/v1 404 envelopes are indistinguishable without prior knowledge.
+
+x-evidence:
+  fetched: '2026-08-23'
+  probes:
+    - url: https://www.laundryheap.com/graphql
+      method: POST
+      status: 200
+    - url: https://www.laundryheap.com/api/v1/orders
+      status: 404
+    - url: https://www.laundryheap.com/api/v1/services
+      status: 404
+    - url: https://www.laundryheap.com/api/v1/services?address=London
+      status: 200
+    - url: https://www.laundryheap.com/oauth/token
+      method: POST
+      status: 400

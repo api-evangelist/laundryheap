@@ -1,0 +1,834 @@
+generated: '2026-08-23'
+method: searched
+source: https://app.laundryheap.com/assets/index-BQ9DuQOF.js — the production single-page-app bundle Laundryheap
+  serves to every visitor, which embeds its GraphQL documents verbatim.
+description: Laundryheap's GraphQL API surface, recorded field by field. Laundryheap publishes no developer
+  portal, no OpenAPI and no schema document, and server-side introspection is disabled, so this is NOT
+  an SDL and must not be read as one. Every field below was read out of the GraphQL operation documents
+  embedded in Laundryheap's own production web-app bundle, and the operation names, variable names and
+  variable types are reproduced exactly as the company ships them. Return types and field selections are
+  deliberately not modelled here, because the schema that would define them is not published.
+endpoint: https://www.laundryheap.com/graphql
+transport: HTTP POST, application/json
+introspection:
+  enabled: false
+  observed: POST {__schema{queryType{name}}} returns 200 with errors[0].message "Field '__schema' doesn't
+    exist on type 'Query'" (extensions.code undefinedField). __type is rejected the same way. __typename
+    resolves normally, so the endpoint is live and speaks GraphQL — introspection specifically is switched
+    off.
+  probed: '2026-08-23'
+authentication:
+  required_for_most_fields: true
+  observed: POST {me{id}} anonymously returns 200 with errors[0].message 'Authentication needed' and extensions.short_code
+    'authentication', data.me null.
+  detail: authentication/laundryheap-authentication.yml
+server:
+  implementation: graphql-ruby (inferred from the undefinedField/selectionMismatch extension codes and
+    did-you-mean suggestions)
+  evidence: 'Querying an unknown field returns a did-you-mean hint: "Field ''serviceCountriesList'' doesn''t
+    exist on type ''Query'' (Did you mean `serviceCountries`?)" — which independently confirmed the field
+    names extracted from the bundle.'
+  cors: 'access-control-allow-origin: *, access-control-allow-methods: GET, POST, OPTIONS'
+x-evidence:
+  fetched: '2026-08-23'
+  endpoint_status: 200
+  introspection_status: 200 with undefinedField error
+  bundle_url: https://app.laundryheap.com/assets/index-BQ9DuQOF.js
+  bundle_bytes: 3084416
+coverage:
+  client_operations_extracted: 68
+  query_fields: 36
+  mutation_fields: 33
+queries:
+- field: addresses
+  arguments:
+  - name: serviceCountry
+    type: ServiceCountryEnum
+  observed_in_client_operations:
+  - myData
+- field: bundleGroups
+  arguments:
+  - name: serviceCountry
+    type: ServiceCountryEnum
+  observed_in_client_operations:
+  - allBundles
+  - bundleGroups
+- field: bundles
+  arguments:
+  - name: serviceCountry
+    type: ServiceCountryEnum
+  observed_in_client_operations:
+  - allBundles
+- field: checkEmailTypos
+  arguments:
+  - name: email
+    type: String!
+  observed_in_client_operations:
+  - checkEmailTypos
+- field: city
+  arguments:
+  - name: id
+    type: ID!
+  observed_in_client_operations:
+  - city
+- field: countries
+  observed_in_client_operations:
+  - countries
+- field: creditCards
+  arguments:
+  - name: serviceCountry
+    type: ServiceCountryEnum
+  observed_in_client_operations:
+  - myData
+- field: creditTransactions
+  arguments:
+  - name: page
+    type: Int
+  observed_in_client_operations:
+  - creditTransactions
+- field: creditsInfo
+  observed_in_client_operations:
+  - creditsInfo
+- field: getCloudFrontInfo
+  observed_in_client_operations:
+  - getCloudFrontInfo
+- field: getExpressOrderInfo
+  arguments:
+  - name: serviceCountry
+    type: ServiceCountryEnum!
+  - name: expressOrderType
+    type: ExpressOrderEnumType!
+  observed_in_client_operations:
+  - getExpressOrderInfo
+- field: getPaymentInfo
+  arguments:
+  - name: serviceCountry
+    type: ServiceCountryEnum!
+  - name: addressID
+    type: Int
+  - name: lat
+    type: Float
+  - name: lng
+    type: Float
+  - name: addressType
+    type: String
+  - name: udprn
+    type: Int
+  - name: tipCents
+    type: Int
+  - name: tipPercentage
+    type: Int
+  - name: redeemCode
+    type: String
+  - name: subscriptionAttempt
+    type: Boolean
+  - name: expressOrderType
+    type: ExpressOrderEnumType
+  - name: useCredits
+    type: Boolean
+  - name: serviceIds
+    type: '[Int!]'
+  - name: items
+    type: '[IdWithQtyInput!]'
+  - name: simplifiedBooking
+    type: Boolean
+  observed_in_client_operations:
+  - getPaymentInfo
+- field: getPaymentPolicy
+  arguments:
+  - name: uuid
+    type: String!
+  observed_in_client_operations:
+  - getPaymentPolicy
+- field: getPersonaSurvey
+  observed_in_client_operations:
+  - getPersonaSurvey
+- field: globalNotice
+  arguments:
+  - name: serviceCountry
+    type: ServiceCountryEnum
+  - name: city
+    type: String
+  observed_in_client_operations:
+  - globalNotice
+- field: globalSettings
+  observed_in_client_operations:
+  - globalSettings
+- field: hotels
+  arguments:
+  - name: serviceCountry
+    type: ServiceCountryEnum!
+  - name: filter
+    type: HotelFilterInputType
+  observed_in_client_operations:
+  - hotels
+- field: isEmailTaken
+  arguments:
+  - name: email
+    type: String!
+  observed_in_client_operations:
+  - verifyEmail
+- field: isPhoneTaken
+  arguments:
+  - name: phone
+    type: String!
+  - name: validatePhone
+    type: Boolean
+  observed_in_client_operations:
+  - verifyPhone
+- field: isPhoneTakenWithEmailV2
+  arguments:
+  - name: phone
+    type: String!
+  observed_in_client_operations:
+  - isPhoneTakenWithEmailV2
+- field: me
+  observed_in_client_operations:
+  - me
+- field: mobileAppUrl
+  arguments:
+  - name: params
+    type: '[SimpleObject!]'
+  observed_in_client_operations:
+  - mobileAppUrl
+- field: order
+  arguments:
+  - name: uuid
+    type: String!
+  observed_in_client_operations:
+  - orders
+- field: ordersV2
+  arguments:
+  - name: page
+    type: Int
+  - name: perPage
+    type: Int
+  - name: sortBy
+    type: OrderSortEnum
+  - name: sortDirection
+    type: SortDirectionEnum
+  - name: state
+    type: OrderStateEnumType!
+  observed_in_client_operations:
+  - ordersV2
+- field: promotionCards
+  observed_in_client_operations:
+  - promotionCards
+- field: purchasedBundles
+  arguments:
+  - name: serviceCountry
+    type: ServiceCountryEnum
+  observed_in_client_operations:
+  - allBundles
+- field: repeatOrder
+  arguments:
+  - name: uuid
+    type: String!
+  observed_in_client_operations:
+  - repeatOrder
+- field: repeatOrderTimeslots
+  arguments:
+  - name: pickupAfterTime
+    type: Time
+  - name: pickupBeforeTime
+    type: Time
+  - name: dropoffAfterTime
+    type: Time
+  - name: dropoffBeforeTime
+    type: Time
+  - name: serviceIds
+    type: '[Int!]'
+  - name: addressId
+    type: Int!
+  - name: addressType
+    type: AvailabilityTypeEnumType!
+  observed_in_client_operations:
+  - repeatOrderTimeslots
+- field: repeatOrders
+  observed_in_client_operations:
+  - repeatOrders
+- field: sendInvoiceMail
+  arguments:
+  - name: uuid
+    type: String!
+  observed_in_client_operations:
+  - sendInvoiceMail
+- field: serviceCountries
+  arguments:
+  - name: serviceCountry
+    type: ServiceCountryEnum
+  observed_in_client_operations:
+  - appInit
+  - serviceCountriesList
+- field: services
+  arguments:
+  - name: serviceCountry
+    type: ServiceCountryEnum
+  - name: latitude
+    type: Float
+  - name: longitude
+    type: Float
+  - name: onlyExpress
+    type: Boolean
+  observed_in_client_operations:
+  - services
+- field: stripePublishableKey
+  arguments:
+  - name: serviceCountry
+    type: ServiceCountryEnum
+  - name: cardProcessor
+    type: String
+  observed_in_client_operations:
+  - appInit
+  - stripePublishableKey
+- field: subscriptions
+  arguments:
+  - name: serviceCountry
+    type: ServiceCountryEnum
+  - name: addressId
+    type: ID
+  - name: serviceCountryCode
+    type: ServiceCountryEnum
+  - name: addressType
+    type: String
+  - name: latitude
+    type: Float
+  - name: longitude
+    type: Float
+  observed_in_client_operations:
+  - appInit
+  - subscriptions
+- field: timeslotsV2
+  arguments:
+  - name: type
+    type: AvailabilityTypeEnumType!
+  - name: pickupAfterTime
+    type: Time
+  - name: pickupBeforeTime
+    type: Time
+  - name: dropoffAfterTime
+    type: Time
+  - name: dropoffBeforeTime
+    type: Time
+  - name: serviceIds
+    type: '[Int]'
+  - name: addressId
+    type: Int
+  - name: latitude
+    type: Float
+  - name: longitude
+    type: Float
+  - name: dayLimit
+    type: Int
+  - name: udprn
+    type: Int
+  - name: orderUuid
+    type: String
+  - name: serviceChangeCheckup
+    type: Boolean
+  - name: pickupMethod
+    type: PickupMethodEnum
+  - name: express
+    type: Boolean
+  - name: pickupUniqueId
+    type: String
+  - name: dropoffUniqueId
+    type: String
+  observed_in_client_operations:
+  - timeslotsV2
+- field: userBenefits
+  observed_in_client_operations:
+  - userBenefits
+mutations:
+- field: applyPromoCode
+  arguments:
+  - name: uuid
+    type: String!
+  - name: promoCode
+    type: String!
+  observed_in_client_operations:
+  - applyPromoCode
+- field: attachPaymentMethod
+  arguments:
+  - name: setupIntent
+    type: String!
+  observed_in_client_operations:
+  - attachPaymentMethod
+- field: authorize
+  arguments:
+  - name: serviceCountry
+    type: ServiceCountryEnum
+  - name: email
+    type: String!
+  - name: redirectUrl
+    type: String
+  observed_in_client_operations:
+  - authorize
+- field: buyCredits
+  arguments:
+  - name: input
+    type: BuyInput!
+  observed_in_client_operations:
+  - buyCredits
+- field: cancelOrder
+  arguments:
+  - name: uuid
+    type: String
+  - name: reasons
+    type: '[OrderCancelReasonInput]'
+  observed_in_client_operations:
+  - cancelOrder
+- field: claimCredits
+  arguments:
+  - name: input
+    type: ClaimInput!
+  observed_in_client_operations:
+  - claimCredits
+- field: createAddress
+  arguments:
+  - name: city
+    type: String
+  - name: country
+    type: String
+  - name: countryCode
+    type: String!
+  - name: latitude
+    type: Float!
+  - name: longitude
+    type: Float!
+  - name: isDefault
+    type: Boolean
+  - name: addressDetails
+    type: String
+  - name: placeId
+    type: String
+  - name: originalAddress
+    type: String
+  - name: addressType
+    type: AddressEnum
+  - name: udprn
+    type: Int
+  - name: pickupType
+    type: String
+  - name: hotelId
+    type: Int
+  - name: postCode
+    type: String
+  observed_in_client_operations:
+  - createAddress
+- field: createGuestUser
+  arguments:
+  - name: serviceCountry
+    type: ServiceCountryEnum!
+  - name: email
+    type: String!
+  - name: firstName
+    type: String
+  - name: lastName
+    type: String
+  - name: phone
+    type: String
+  - name: affiliateId
+    type: String
+  - name: companyUser
+    type: Boolean
+  - name: companyName
+    type: String
+  - name: companyTax
+    type: String
+  observed_in_client_operations:
+  - createGuestUser
+- field: createOrder
+  arguments:
+  - name: pickupAfterDateTime
+    type: String!
+  - name: pickupBeforeDateTime
+    type: String!
+  - name: dropOffAfterDateTime
+    type: String!
+  - name: dropOffBeforeDateTime
+    type: String!
+  - name: collectFromPorter
+    type: Boolean
+  - name: deliverToPorter
+    type: Boolean
+  - name: services
+    type: '[OrderServiceInput]!'
+  - name: cardId
+    type: String
+  - name: addressId
+    type: Int
+  - name: notesForWash
+    type: String
+  - name: notesForDriver
+    type: String
+  - name: promoCode
+    type: String
+  - name: googleClientId
+    type: String
+  - name: paymentIntentId
+    type: String
+  - name: pickupType
+    type: String
+  - name: roomNumber
+    type: String
+  - name: pickupMethod
+    type: String
+  - name: dropoffMethod
+    type: String
+  - name: affiliate
+    type: String
+  - name: unlimitedPlanId
+    type: Int
+  - name: tipCents
+    type: Int
+  - name: tipPercentage
+    type: Int
+  - name: estimatedPriceCents
+    type: Int
+  - name: repeatPeriod
+    type: RepeatOrderRepeatPeriodEnumType
+  - name: repeatType
+    type: RepeatOrderRepeatTypeEnumType
+  - name: subscriptionShortCode
+    type: SubscriptionShortCodeEnum
+  - name: defaultPickupAfterDateTime
+    type: String
+  - name: defaultPickupBeforeDateTime
+    type: String
+  - name: defaultDropOffAfterDateTime
+    type: String
+  - name: defaultDropOffBeforeDateTime
+    type: String
+  - name: firstGreenPickupAfterDateTime
+    type: String
+  - name: firstGreenPickupBeforeDateTime
+    type: String
+  - name: firstGreenDropOffAfterDateTime
+    type: String
+  - name: firstGreenDropOffBeforeDateTime
+    type: String
+  - name: offeredPickupAfterDateTime
+    type: String
+  - name: offeredPickupBeforeDateTime
+    type: String
+  - name: offeredDropOffAfterDateTime
+    type: String
+  - name: offeredDropOffBeforeDateTime
+    type: String
+  - name: locker
+    type: OrderLockerInput
+  - name: paymentSetupParams
+    type: '[SimpleObject!]'
+  - name: expressOrderType
+    type: ExpressOrderEnumType
+  - name: defaultPickupOptimizationMethod
+    type: OptimizationMethodEnum
+  - name: defaultDropoffOptimizationMethod
+    type: OptimizationMethodEnum
+  - name: useCredits
+    type: Boolean
+  - name: anonymousUser
+    type: Boolean
+  - name: fbc
+    type: String
+  - name: fbp
+    type: String
+  - name: cje
+    type: String
+  - name: simplifiedBooking
+    type: Boolean
+  - name: selfItemizationItems
+    type: '[IdWithQtyInput!]!'
+  - name: quickBooking
+    type: Boolean
+  observed_in_client_operations:
+  - createOrder
+- field: createSetupIntent
+  arguments:
+  - name: serviceCountryCode
+    type: ServiceCountryEnum
+  observed_in_client_operations:
+  - createSetupIntent
+- field: createStripeCustomer
+  arguments:
+  - name: token
+    type: String!
+  - name: pubKey
+    type: String
+  - name: isDefault
+    type: Boolean
+  observed_in_client_operations:
+  - createStripeCustomer
+- field: createSubscription
+  arguments:
+  - name: subscriptionShortCode
+    type: SubscriptionShortCodeEnum!
+  - name: paymentMethodId
+    type: String!
+  - name: paymentIntentId
+    type: String
+  observed_in_client_operations:
+  - createSubscription
+- field: createUserDeviceInfo
+  arguments:
+  - name: deviceOs
+    type: DeviceOsEnum!
+  - name: deviceIdType
+    type: DeviceIdTypeEnum!
+  - name: deviceId
+    type: String!
+  observed_in_client_operations:
+  - createUserDeviceInfo
+- field: modifyOrder
+  arguments:
+  - name: uuid
+    type: String
+  - name: pickupAfterDateTime
+    type: String
+  - name: pickupBeforeDateTime
+    type: String
+  - name: dropOffAfterDateTime
+    type: String
+  - name: dropOffBeforeDateTime
+    type: String
+  - name: collectFromPorter
+    type: Boolean
+  - name: deliverToPorter
+    type: Boolean
+  - name: pickupMethod
+    type: String
+  - name: dropoffMethod
+    type: String
+  - name: pickupDriverNotes
+    type: String
+  - name: dropoffDriverNotes
+    type: String
+  observed_in_client_operations:
+  - modifyOrder
+- field: notify
+  arguments:
+  - name: email
+    type: String
+  - name: latitude
+    type: Float!
+  - name: longitude
+    type: Float!
+  - name: originalAddress
+    type: String!
+  observed_in_client_operations:
+  - notify
+- field: postDriverPickupReview
+  arguments:
+  - name: uuid
+    type: String!
+  - name: score
+    type: Int
+  - name: step
+    type: OrderDriverPickupReviewStepEnum!
+  - name: options
+    type: '[OrderDriverPickupReviewOptionEnum!]'
+  - name: review
+    type: String
+  - name: surveyResponse
+    type: '[ReviewSurveyResponse!]'
+  observed_in_client_operations:
+  - postDriverPickupReview
+- field: postServiceReview
+  arguments:
+  - name: uuid
+    type: String!
+  - name: score
+    type: Int
+  - name: step
+    type: ServiceReviewStepEnum!
+  - name: options
+    type: '[ServiceReviewOptionEnum!]'
+  - name: review
+    type: String
+  - name: surveyResponse
+    type: '[ReviewSurveyResponse!]'
+  observed_in_client_operations:
+  - postServiceReview
+- field: purchaseBundle
+  arguments:
+  - name: bundleId
+    type: Int!
+  - name: cardId
+    type: String
+  - name: paymentIntentId
+    type: String
+  - name: paymentSetupParams
+    type: '[SimpleObject!]'
+  observed_in_client_operations:
+  - buyBundle
+- field: redeemSubscriptionCode
+  arguments:
+  - name: code
+    type: String!
+  observed_in_client_operations:
+  - redeemSubscriptionCode
+- field: removePromoCode
+  arguments:
+  - name: uuid
+    type: String!
+  observed_in_client_operations:
+  - removePromoCode
+- field: repeatOrderDelete
+  arguments:
+  - name: uuid
+    type: String!
+  observed_in_client_operations:
+  - repeatOrderDelete
+- field: repeatOrderUpdate
+  arguments:
+  - name: addressId
+    type: ID
+  - name: dropoffAfterDateTime
+    type: String
+  - name: dropoffBeforeDateTime
+    type: String
+  - name: dropoffMethod
+    type: String
+  - name: pickupAfterDateTime
+    type: String
+  - name: pickupBeforeDateTime
+    type: String
+  - name: pickupMethod
+    type: String
+  - name: repeatPeriod
+    type: RepeatOrderRepeatPeriodEnumType
+  - name: services
+    type: '[OrderServiceInput!]'
+  - name: uuid
+    type: String!
+  - name: pickupDriverNotes
+    type: String
+  - name: dropoffDriverNotes
+    type: String
+  observed_in_client_operations:
+  - repeatOrderUpdate
+- field: repeatOrderUpdateSchedule
+  arguments:
+  - name: input
+    type: UpdateScheduleInput!
+  observed_in_client_operations:
+  - repeatOrderUpdateSchedule
+- field: resolutionCenterContactUs
+  arguments:
+  - name: input
+    type: ContactUsInput!
+  observed_in_client_operations:
+  - resolutionCenterContactUs
+- field: setDefaultCreditCard
+  arguments:
+  - name: cardId
+    type: String
+  observed_in_client_operations:
+  - setDefaultCreditCard
+- field: setPersonaSurvey
+  arguments:
+  - name: answers
+    type: '[SetPersonaSurveyType]!'
+  observed_in_client_operations:
+  - setPersonaSurvey
+- field: signInWithMagicLink
+  arguments:
+  - name: token
+    type: String!
+  observed_in_client_operations:
+  - verifyMagicLink
+- field: updateAddress
+  arguments:
+  - name: id
+    type: ID!
+  - name: city
+    type: String
+  - name: country
+    type: String
+  - name: countryCode
+    type: String
+  - name: latitude
+    type: Float!
+  - name: longitude
+    type: Float!
+  - name: isDefault
+    type: Boolean
+  - name: addressDetails
+    type: String
+  - name: placeId
+    type: String
+  - name: originalAddress
+    type: String
+  - name: addressType
+    type: AddressEnum
+  - name: udprn
+    type: Int
+  - name: pickupType
+    type: String
+  - name: hotelId
+    type: Int
+  - name: postCode
+    type: String
+  observed_in_client_operations:
+  - updateAddress
+- field: updateOrderServices
+  arguments:
+  - name: uuid
+    type: String!
+  - name: services
+    type: '[OrderServiceInput]!'
+  - name: selfItemizationItems
+    type: '[IdWithQtyInput!]'
+  observed_in_client_operations:
+  - updateOrderServices
+- field: updateSubscription
+  arguments:
+  - name: paymentMethodId
+    type: String!
+  - name: subscriptionShortCode
+    type: SubscriptionShortCodeEnum!
+  observed_in_client_operations:
+  - updateSubscription
+- field: updateUser
+  arguments:
+  - name: firstName
+    type: String
+  - name: lastName
+    type: String
+  - name: phone
+    type: String
+  - name: serviceCountry
+    type: ServiceCountryEnum
+  - name: companyUser
+    type: Boolean
+  - name: companyName
+    type: String
+  - name: companyTax
+    type: String
+  - name: locale
+    type: String
+  - name: affiliateId
+    type: String
+  observed_in_client_operations:
+  - updateUser
+- field: validPromotion
+  arguments:
+  - name: promoCode
+    type: String!
+  - name: serviceCountry
+    type: ServiceCountryEnum
+  - name: simplifiedBooking
+    type: Boolean
+  observed_in_client_operations:
+  - validPromotion
+- field: validateAddressWithMappedCity
+  arguments:
+  - name: latitude
+    type: Float!
+  - name: longitude
+    type: Float!
+  - name: serviceCountry
+    type: ServiceCountryEnum
+  observed_in_client_operations:
+  - validateAddressWithMappedCity

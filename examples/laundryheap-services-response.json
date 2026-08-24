@@ -1,0 +1,51 @@
+[
+    {
+        "title": "Mixed Wash & Fold",
+        "short_code": "mixed_wash",
+        "description": "Light and dark clothes will be washed together.",
+        "minimum_service_minutes": 1440,
+        "turnaround_time": null
+    },
+    {
+        "title": "Separate Wash & Fold",
+        "short_code": "separate_wash",
+        "description": "Light and dark clothes washed separately. Requires at least 2 washes of 6kg each.",
+        "minimum_service_minutes": 1440,
+        "turnaround_time": null
+    },
+    {
+        "title": "Wash & Iron",
+        "short_code": "wash_and_iron",
+        "description": "Everyday laundry ironed after drying and put on hangers. Priced per item.",
+        "minimum_service_minutes": 1440,
+        "turnaround_time": null
+    },
+    {
+        "title": "Dry Cleaning",
+        "short_code": "dry_cleaning",
+        "description": "Cleaned and ironed, put on hangers by default. Priced per item.",
+        "minimum_service_minutes": 1440,
+        "turnaround_time": null
+    },
+    {
+        "title": "Ironing only",
+        "short_code": "ironing",
+        "description": "You take care of washing, we just iron them for you. Priced per item.",
+        "minimum_service_minutes": 1440,
+        "turnaround_time": null
+    },
+    {
+        "title": "Duvets & Bulky Items",
+        "short_code": "duvets_bulky_items",
+        "description": "Larger items that require a different cleaning process. Up to 72 hours to process.",
+        "minimum_service_minutes": 4320,
+        "turnaround_time": "3 day service"
+    },
+    {
+        "title": "Repairs",
+        "short_code": "repairs",
+        "description": "Usually takes 48 hours. Please use the box below to add details.",
+        "minimum_service_minutes": 4320,
+        "turnaround_time": "3 day service"
+    }
+]

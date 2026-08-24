@@ -1,0 +1,147 @@
+generated: '2026-08-23'
+method: probed
+source: >-
+  Live probes of Laundryheap's OAuth/OIDC discovery surface and GraphQL endpoint
+  (2026-08-23), plus a search of the public website and Help Centre for
+  compliance claims.
+description: >-
+  What Laundryheap's contracts actually conform to. The picture is lopsided: the
+  authorization server is a careful, standards-clean implementation of five
+  separate OAuth/OIDC RFCs, while everything downstream of it — errors,
+  discovery, documentation — conforms to nothing at all.
+
+standards:
+  - id: oauth2
+    name: OAuth 2.0 (RFC 6749)
+    conforms: true
+    evidence: >-
+      Live authorization server at https://www.laundryheap.com/oauth with
+      authorization_code and client_credentials grants; RFC 6749 §5.2 error
+      bodies observed on /oauth/token.
+  - id: oauth2-metadata
+    name: OAuth 2.0 Authorization Server Metadata (RFC 8414)
+    conforms: true
+    evidence: >-
+      /.well-known/oauth-authorization-server returns 200 with a complete
+      metadata document (issuer, endpoints, grant/response types, scopes).
+  - id: oidc-discovery
+    name: OpenID Connect Discovery 1.0
+    conforms: true
+    evidence: >-
+      /.well-known/openid-configuration returns 200; issuer, jwks_uri,
+      userinfo_endpoint, subject_types_supported, id_token_signing_alg_values_supported
+      all present. JWKS resolves with one RS256 key.
+  - id: oidc-core
+    name: OpenID Connect Core 1.0
+    conforms: true
+    evidence: >-
+      `openid` scope advertised, RS256 id_token signing, public subject type,
+      claims [iss, sub, aud, exp, iat], userinfo endpoint returns 401 unauthenticated.
+  - id: pkce
+    name: PKCE (RFC 7636)
+    conforms: true
+    evidence: 'code_challenge_methods_supported: [plain, S256]'
+    note: >-
+      S256 is supported, but `plain` is also advertised. RFC 7636 §4.2 requires
+      clients to use S256 where available; advertising `plain` permits the weaker
+      transform.
+  - id: oauth2-dynamic-client-registration
+    name: OAuth 2.0 Dynamic Client Registration (RFC 7591)
+    conforms: partial
+    evidence: >-
+      registration_endpoint advertised and live; POST validates and returns 400
+      on missing name/redirect_uri.
+    deviation: >-
+      Returns error code `invalid_client_params`; RFC 7591 §3.2.2 defines
+      `invalid_client_metadata` for this case.
+  - id: oauth2-token-introspection
+    name: OAuth 2.0 Token Introspection (RFC 7662)
+    conforms: true
+    evidence: introspection_endpoint advertised and live (400 unauthenticated).
+  - id: oauth2-token-revocation
+    name: OAuth 2.0 Token Revocation (RFC 7009)
+    conforms: true
+    evidence: revocation_endpoint advertised and live (403 unauthenticated).
+  - id: graphql
+    name: GraphQL over HTTP
+    conforms: true
+    evidence: >-
+      POST /graphql accepts application/json, returns spec-shaped
+      {data, errors[]} with transport 200 and errors carrying message/locations/path/extensions.
+    deviation: >-
+      Introspection is disabled, which GraphQL permits but which removes the
+      spec's own discovery mechanism — there is no machine-readable schema.
+  - id: rfc9457-problem-details
+    conforms: false
+    evidence: >-
+      No application/problem+json response on any surface; four different
+      proprietary error envelopes observed instead. See errors/laundryheap-problem-types.yml.
+  - id: openapi
+    conforms: false
+    evidence: >-
+      No OpenAPI or Swagger document at any probed location on any Laundryheap
+      host. See x-coverage in apis.yml.
+  - id: asyncapi
+    conforms: false
+    evidence: No event, streaming or webhook surface published.
+  - id: rfc9116-security-txt
+    conforms: false
+    evidence: /.well-known/security.txt returns 404 on every host.
+  - id: rfc8594-sunset-header
+    conforms: false
+    evidence: No Sunset or Deprecation header observed on any response.
+  - id: rfc8615-well-known
+    conforms: true
+    evidence: >-
+      Two real documents served under /.well-known/ on www.laundryheap.com, with
+      a 404 negative control confirming the host is not a catch-all.
+  - id: hsts
+    name: HTTP Strict Transport Security (RFC 6797)
+    conforms: true
+    evidence: 'strict-transport-security: max-age=63072000; includeSubDomains'
+  - id: cors
+    conforms: true
+    evidence: 'Preflight answered on /graphql: allow-origin *, allow-methods GET, POST, OPTIONS.'
+
+domain_standard:
+  applicable: false
+  sector: on-demand consumer services / last-mile logistics
+  assessment: >-
+    Reward-only check, and there is nothing to reward or penalise here. Consumer
+    laundry and dry-cleaning delivery has no interchange standard — no schema,
+    message type, identifier scheme or transaction format that a peer would
+    already speak. Probed for the adjacent logistics candidates (GS1, EDIFACT
+    IFTMIN, X12 214, OAGIS) and found no trace of any of them in the contract.
+    Laundryheap's order model is entirely bespoke, which in this market is
+    normal rather than a defect.
+  candidates_probed: [gs1, edifact, x12, oagis, schema-org-service]
+  conforms: null
+
+compliance_program:
+  published: false
+  certifications: []
+  trust_center: null
+  note: >-
+    No SOC 2, ISO 27001, PCI DSS, HIPAA or FedRAMP claim found. trust., security.
+    and status. subdomains do not resolve; /trust, /compliance and /security all
+    soft-404 to the homepage. A privacy policy exists at
+    https://www.laundryheap.com/privacy and the Help Centre carries a
+    "Protecting your data" section, but neither names a certification or an
+    audit. No `Compliance` pointer is emitted for this provider.
+  gdpr_relevant: true
+  gdpr_note: >-
+    UK-headquartered and operating across the EU, so UK GDPR / GDPR apply as a
+    matter of law. That is a legal obligation, not a published compliance
+    posture, and it is not recorded as a conformance.
+
+summary:
+  conforms_count: 10
+  fails_count: 5
+  headline: >-
+    Ten standards met, all of them in the identity layer. The company that built
+    a spec-clean OAuth 2.0 + OIDC server with introspection, revocation, PKCE and
+    dynamic client registration then published no documentation for it, no
+    security.txt, no OpenAPI, and four incompatible error envelopes.
+
+x-evidence:
+  fetched: '2026-08-23'

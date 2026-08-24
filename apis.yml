@@ -1,23 +1,155 @@
 aid: laundryheap
 name: Laundryheap
-description: 'Laundryheap is a company surfaced via the API Evangelist harvest backlog (source: secondary-market)
-  and added to the network as a stub for full-pipeline profiling.'
+description: >-
+  Laundryheap is a London-founded on-demand laundry and dry-cleaning company that
+  collects, cleans and returns clothing within 24 hours, operating across the
+  United Kingdom, United States, Ireland, the Netherlands, Sweden, Denmark, the
+  UAE, Qatar, Kuwait, Bahrain and Singapore. It serves consumers directly through
+  iOS, Android and web apps, and businesses through hotel-affiliate, commercial
+  laundry and dry-cleaning partner programmes. Laundryheap operates no developer
+  portal and publishes no API documentation, but it does run a real, live,
+  standards-clean OAuth 2.0 and OpenID Connect authorization server on its own
+  root host — complete with PKCE, token introspection, token revocation and open
+  dynamic client registration — advertising an `orders.create` scope, alongside a
+  production GraphQL API of 69 fields and a small unauthenticated JSON endpoint
+  that returns its service catalogue. The API surface is real and substantial;
+  what is missing is any documentation of it.
+image: https://prod-cdn.laundryheap.com/images/static/og_image.jpg
 url: https://raw.githubusercontent.com/api-evangelist/laundryheap/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:secondary-market
-x-tier: stub
-x-tier-reason: harvest
 specificationVersion: '0.20'
 created: '2026-08-23'
 modified: '2026-08-23'
 tags:
 - Company
-apis: []
+- Laundry
+- Dry Cleaning
+- On-Demand Services
+- Logistics
+- Last Mile Delivery
+- Consumer Services
+- Hospitality
+- Ordering
+- GraphQL
+- OAuth
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
+apis:
+- name: Laundryheap GraphQL API
+  description: >-
+    Laundryheap's primary product API. A single GraphQL endpoint serving the
+    consumer web and mobile apps, covering ordering, recurring orders, addresses,
+    timeslots, services, hotels, subscriptions, bundles, credits, promotions,
+    Stripe-backed payment methods and reviews. Introspection is disabled and no
+    schema is published, so the 69 fields recorded in this profile were read out
+    of Laundryheap's own production client bundle and confirmed field-by-field
+    against the live endpoint's did-you-mean errors.
+  humanURL: https://www.laundryheap.com/
+  baseURL: https://www.laundryheap.com/graphql
+  tags:
+  - GraphQL
+  - Ordering
+  - Laundry
+  properties:
+  - type: GraphQL
+    url: graphql/laundryheap-graphql.yml
+  - type: DataModel
+    url: data-model/laundryheap-data-model.yml
+  - type: ErrorCatalog
+    url: errors/laundryheap-problem-types.yml
+- name: Laundryheap OAuth 2.0 / OpenID Connect Authorization Server
+  description: >-
+    A live, spec-clean OAuth 2.0 and OpenID Connect provider on Laundryheap's root
+    host, discovered only by probing /.well-known/. It advertises the
+    authorization_code (with PKCE) and client_credentials grants, RS256 ID tokens,
+    RFC 7662 introspection, RFC 7009 revocation and open RFC 7591 dynamic client
+    registration, and it declares a single business scope, `orders.create` — the
+    only public evidence anywhere that Laundryheap intends third parties to place
+    orders programmatically. No documentation for it exists.
+  humanURL: https://www.laundryheap.com/.well-known/openid-configuration
+  baseURL: https://www.laundryheap.com/oauth
+  tags:
+  - OAuth
+  - OpenID Connect
+  - Authentication
+  properties:
+  - type: OpenIDConnect
+    url: well-known/laundryheap-openid-configuration.json
+  - type: Authentication
+    url: authentication/laundryheap-authentication.yml
+  - type: OAuthScopes
+    url: scopes/laundryheap-scopes.yml
+- name: Laundryheap Service Catalogue API
+  description: >-
+    A small unauthenticated JSON endpoint under /api/v1 that returns the laundry
+    and dry-cleaning services available at a given address, with each service's
+    short code, description, minimum service duration and turnaround time. It is
+    the only Laundryheap endpoint that answers usefully without credentials.
+  humanURL: https://www.laundryheap.com/en-gb/pricing
+  baseURL: https://www.laundryheap.com/api/v1
+  tags:
+  - REST
+  - Catalog
+  properties:
+  - type: Examples
+    url: examples/laundryheap-services-response.json
 common:
+- type: DomainSecurity
+  url: security/laundryheap-domain-security.yml
 - type: Website
-  url: https://www.hiive.com/securities/laundryheap-stock
+  url: https://www.laundryheap.com/
+- type: WellKnown
+  url: well-known/laundryheap-well-known.yml
+- type: Conventions
+  url: conventions/laundryheap-conventions.yml
+- type: Conformance
+  url: conformance/laundryheap-conformance.yml
+- type: Lifecycle
+  url: lifecycle/laundryheap-lifecycle.yml
+- type: RateLimits
+  url: rate-limits/laundryheap-rate-limits.yml
+- type: Plans
+  url: plans/laundryheap-plans-pricing.yml
+- type: Packages
+  url: packages/laundryheap-packages.yml
+- type: Pricing
+  url: https://www.laundryheap.com/en-gb/pricing
+- type: TermsOfService
+  url: https://www.laundryheap.com/en-us/terms
+- type: PrivacyPolicy
+  url: https://www.laundryheap.com/privacy
+- type: Support
+  url: https://help.laundryheap.com/en/
+- type: Blog
+  url: https://www.laundryheap.com/blog/
+- type: GitHubOrganization
+  url: https://github.com/laundryheap
+- type: SignUp
+  url: https://app.laundryheap.com/
+- type: Authentication
+  url: authentication/laundryheap-authentication.yml
+- type: OAuthScopes
+  url: scopes/laundryheap-scopes.yml
+- type: OpenIDConnect
+  url: well-known/laundryheap-openid-configuration.json
+- type: GraphQL
+  url: graphql/laundryheap-graphql.yml
+- type: ErrorCatalog
+  url: errors/laundryheap-problem-types.yml
+- type: DataModel
+  url: data-model/laundryheap-data-model.yml
+- type: Examples
+  url: examples/laundryheap-services-response.json
+- type: LLMsTxt
+  url: llms/laundryheap-llms.txt
+- type: AgentSkill
+  url: skills/_index.yml
+x-enrichment:
+  date: '2026-08-23'
+  status: enriched
+  artifacts_added: 22
+  pass: local-v1

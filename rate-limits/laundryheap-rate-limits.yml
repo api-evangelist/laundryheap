@@ -1,0 +1,67 @@
+generated: '2026-08-23'
+method: probed
+source: >-
+  Live unauthenticated probes of https://www.laundryheap.com/graphql and
+  /api/v1/services on 2026-08-23, plus a search of every Laundryheap public page
+  for published limits.
+description: >-
+  Laundryheap publishes no rate limits and emits no rate-limit headers. An agent
+  integrating against this API has no runtime signal at all — it cannot know how
+  much budget it has, how much it has used, or how long to wait after a refusal.
+limit_count: 0
+published: false
+docs: null
+
+response_headers:
+  ratelimit_standard: absent
+  x_ratelimit: absent
+  retry_after: absent
+  observed_headers_on_200:
+    - strict-transport-security
+    - x-request-id
+    - x-runtime
+    - x-frame-options
+    - x-content-type-options
+    - referrer-policy
+    - etag
+    - cache-control
+    - vary
+    - via
+  note: >-
+    No RateLimit-Limit / RateLimit-Remaining / RateLimit-Reset (RFC 9238 draft
+    shape), no X-RateLimit-*, and no Retry-After on any response observed.
+
+exhaustion_behaviour:
+  status_code: unknown
+  body: unknown
+  note: >-
+    Not established. Twelve consecutive unauthenticated POSTs to /graphql all
+    returned 200. No further load was applied — probing a live consumer service
+    until it refuses is out of bounds for this pipeline, so the throttle
+    threshold and its response are recorded as unknown rather than guessed.
+
+edge:
+  cdn: Amazon CloudFront
+  evidence: 'via: 1.1 <id>.cloudfront.net (CloudFront) on every response'
+  note: >-
+    CloudFront and the nginx origin will impose some effective ceiling, but no
+    ceiling is advertised to the client and none can be relied on.
+
+limits: []
+
+gaps:
+  - No published rate limits.
+  - No rate-limit response headers on any surface.
+  - No Retry-After on any response.
+  - Exhaustion behaviour undocumented and unobserved.
+
+x-evidence:
+  fetched: '2026-08-23'
+  probes:
+    - url: https://www.laundryheap.com/graphql
+      method: POST
+      status: 200
+      repetitions: 12
+      note: all 200, no rate-limit headers
+    - url: https://www.laundryheap.com/api/v1/services?address=London
+      status: 200

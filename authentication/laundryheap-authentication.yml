@@ -1,0 +1,129 @@
+generated: '2026-08-23'
+method: probed
+source: >-
+  https://www.laundryheap.com/.well-known/openid-configuration (HTTP 200) and
+  live unauthenticated probes of every endpoint it advertises, plus the observed
+  auth behaviour of https://www.laundryheap.com/graphql.
+description: >-
+  Laundryheap runs a full OAuth 2.0 authorization server with OpenID Connect on
+  its own root host. Nothing about it is documented on the public website — it
+  was found only by probing /.well-known/ — but every endpoint it advertises is
+  live and answers with standards-compliant errors, and it advertises a
+  domain-specific `orders.create` scope. This is the company's real
+  authentication surface.
+
+primary_scheme: oauth2
+schemes:
+  - id: oauth2
+    type: oauth2
+    description: >-
+      OAuth 2.0 / OpenID Connect provider (Doorkeeper + doorkeeper-openid_connect
+      shape). Supports authorization_code with PKCE for user-delegated access and
+      client_credentials for server-to-server partner access.
+    issuer: https://www.laundryheap.com
+    flows:
+      authorization_code:
+        authorization_url: https://www.laundryheap.com/oauth/authorize
+        token_url: https://www.laundryheap.com/oauth/token
+        refresh_url: null
+        pkce:
+          supported: true
+          code_challenge_methods: [plain, S256]
+        scopes:
+          openid: OpenID Connect — issue an ID token identifying the end user.
+          orders.create: >-
+            Create orders on behalf of the authenticated account. The only
+            business scope the authorization server advertises.
+      client_credentials:
+        token_url: https://www.laundryheap.com/oauth/token
+        scopes:
+          orders.create: Create orders as the client itself (server-to-server).
+    token_endpoint_auth_methods: [client_secret_basic, client_secret_post]
+    response_types: [code]
+    response_modes: [query, fragment, form_post]
+
+  - id: session_cookie
+    type: cookie
+    description: >-
+      The first-party web app and the REST/GraphQL surfaces also accept the
+      Rails session cookies (_session_id, _laundry_heap_session) set on any
+      request to www.laundryheap.com. This is the browser path, not an
+      integration path.
+    observed: Set-Cookie on GET /api/v1/services (httponly; samesite=lax; secure)
+
+openid_connect:
+  discovery: https://www.laundryheap.com/.well-known/openid-configuration
+  document: well-known/laundryheap-openid-configuration.json
+  userinfo_endpoint: https://www.laundryheap.com/oauth/userinfo
+  jwks_uri: https://www.laundryheap.com/oauth/discovery/keys
+  jwks_file: well-known/laundryheap-jwks.json
+  id_token_signing_alg: [RS256]
+  subject_types: [public]
+  claims_supported: [iss, sub, aud, exp, iat]
+  claim_types: [normal]
+
+dynamic_client_registration:
+  supported: true
+  spec: RFC 7591
+  endpoint: https://www.laundryheap.com/oauth/registration
+  observed: >-
+    POST with an empty body returns 400
+    {"error":"invalid_client_params","error_description":"Name can't be blank,
+    Redirect URI can't be blank"} — the endpoint is live and validating, not a
+    stub. GET returns 404.
+  note: >-
+    Open dynamic client registration is unusual for a consumer marketplace and is
+    the strongest single signal that Laundryheap intends third parties to
+    integrate. No published documentation explains who may register.
+
+token_management:
+  introspection_endpoint: https://www.laundryheap.com/oauth/introspect
+  introspection_spec: RFC 7662
+  revocation_endpoint: https://www.laundryheap.com/oauth/revoke
+  revocation_spec: RFC 7009
+
+graphql_authentication:
+  endpoint: https://www.laundryheap.com/graphql
+  anonymous_fields: >-
+    A small number of fields resolve anonymously (__typename, and field-shape
+    errors are returned rather than auth errors for countries/globalSettings).
+    Account fields are gated.
+  gated_response: >-
+    errors[0].message "Authentication needed" with
+    extensions.short_code "authentication" and data.<field> null, returned under
+    HTTP 200 per the GraphQL spec.
+  magic_link: >-
+    The web client also carries an `authorize(email)` mutation and a
+    `signInWithMagicLink(token)` mutation — a passwordless email flow, separate
+    from the OAuth server.
+  social_login: >-
+    Apple (com.LaundryHeap.applelogin), Google (/auth/google) and Facebook
+    (/auth/facebook) sign-in are wired into the web app.
+
+x-evidence:
+  fetched: '2026-08-23'
+  probes:
+    - url: https://www.laundryheap.com/.well-known/openid-configuration
+      status: 200
+    - url: https://www.laundryheap.com/oauth/token
+      method: POST
+      status: 400
+      body: '{"error":"invalid_request","error_description":"Missing required parameter: grant_type."}'
+    - url: https://www.laundryheap.com/oauth/userinfo
+      status: 401
+    - url: https://www.laundryheap.com/oauth/introspect
+      method: POST
+      status: 400
+    - url: https://www.laundryheap.com/oauth/registration
+      method: POST
+      status: 400
+    - url: https://www.laundryheap.com/oauth/revoke
+      method: POST
+      status: 403
+    - url: https://www.laundryheap.com/oauth/discovery/keys
+      status: 200
+
+gaps:
+  - No public developer documentation describes any of this surface.
+  - No published scope reference; `orders.create` is known only from the discovery document.
+  - No documented process for obtaining client credentials.

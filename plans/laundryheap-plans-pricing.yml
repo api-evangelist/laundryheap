@@ -1,0 +1,132 @@
+generated: '2026-08-23'
+method: searched
+source: >-
+  https://www.laundryheap.com/en-gb/pricing and its five per-service pricelists,
+  fetched 2026-08-23.
+description: >-
+  Laundryheap sells a service, not API access. There is no API plan, no
+  developer tier and no published cost for calling the API — the OAuth server
+  and its `orders.create` scope have no commercial terms attached to them
+  anywhere on the public surface. What Laundryheap does publish, and publishes
+  well, is a full itemised consumer pricelist per country and per service. Both
+  facts are recorded below: the API plan count is an honest zero, and the
+  service pricing is captured because it is the real, published, machine-usable
+  commercial surface an agent would be pricing against.
+
+plan_count: 0
+plans: []
+plans_note: >-
+  Zero API access plans. Probed /en-gb/subscriptions, /en-gb/membership and
+  /en-gb/plans — all three soft-404 to the homepage. No developer pricing page,
+  no free tier, no rate-card, no "contact sales" API form. Partner enquiries go
+  to collaborate@laundryheap.com with no published terms.
+
+api_commercial_model:
+  published: false
+  access_request: collaborate@laundryheap.com (general business enquiries; not an API programme)
+  free_tier: null
+  note: >-
+    Dynamic client registration is open at /oauth/registration, so a client can
+    self-register without any commercial agreement being visible. Whether that
+    grants usable access is not published.
+
+service_pricing:
+  published: true
+  currency_varies_by_country: true
+  structure: >-
+    Per-country pricelists, one per service. Wash & Fold is priced by weight;
+    Wash & Iron, Dry Cleaning, Ironing and Duvets & Bulky Items are priced per
+    item. The booking flow itemises the actual order and the site states
+    "Prices depend on your city and the items you send. You'll see exact pricing
+    upfront before confirming your order."
+  machine_readable_endpoint:
+    url: https://www.laundryheap.com/api/v1/services?address=<address>
+    status: 200
+    note: >-
+      Returns the service catalogue (title, short_code, description,
+      minimum_service_minutes, turnaround_time) for a resolvable address,
+      unauthenticated. Saved verbatim at
+      examples/laundryheap-services-response.json. It returns the catalogue, not
+      the prices.
+  region_sampled: United Kingdom (en-gb)
+  sampled_on: '2026-08-23'
+  services:
+    - service: Wash & Fold
+      short_code: mixed_wash
+      pricelist: https://www.laundryheap.com/en-gb/pricing/wash/pricelist
+      basis: weight
+      items:
+        - {name: Mixed Wash & Fold, price: 19.50, currency: GBP, unit: per 6kg}
+        - {name: Separate Wash & Fold, price: 39.00, currency: GBP, unit: per 12kg}
+        - {name: Additional Weight, price: 3.75, currency: GBP, unit: per kg}
+    - service: Wash & Iron
+      short_code: wash_and_iron
+      pricelist: https://www.laundryheap.com/en-gb/pricing/wash-and-iron/pricelist
+      basis: per-item
+      sample_items:
+        - {name: Shirt on Hanger, price: 2.95, currency: GBP}
+        - {name: Trousers, price: 8.95, currency: GBP}
+        - {name: Dress, price: 13.95, currency: GBP}
+        - {name: Overcoat / Raincoat, price: 15.95, currency: GBP}
+        - {name: Designer Puffer / Down Coat, price: 59.00, currency: GBP}
+    - service: Dry Cleaning
+      short_code: dry_cleaning
+      pricelist: https://www.laundryheap.com/en-gb/pricing/dry-cleaning/pricelist
+      basis: per-item
+      sample_items:
+        - {name: Shirt on Hanger, price: 2.95, currency: GBP}
+        - {name: 2-Piece Suit, price: 15.45, currency: GBP}
+        - {name: 3-Piece Suit, price: 21.20, currency: GBP}
+        - {name: Dress - Evening, price: 26.95, currency: GBP}
+        - {name: Designer Puffer / Down Coat, price: 59.00, currency: GBP}
+      note: A "Delicate" surcharge tier applies to silk, wool, lace and suede on many items.
+    - service: Ironing only
+      short_code: ironing
+      pricelist: https://www.laundryheap.com/en-gb/pricing/ironing/pricelist
+      basis: per-item
+      sample_items:
+        - {name: Shirt on Hanger, price: 2.85, currency: GBP}
+        - {name: Trousers, price: 5.95, currency: GBP}
+        - {name: Bed Sheet - All Sizes, price: 6.95, currency: GBP}
+        - {name: Tea Towel, price: 1.45, currency: GBP}
+    - service: Duvets & Bulky Items
+      short_code: duvets_bulky_items
+      pricelist: https://www.laundryheap.com/en-gb/pricing/duvets-bulky-items/pricelist
+      basis: per-item
+      turnaround: 3 day service
+      sample_items:
+        - {name: Feather Duvet - Single, price: 22.50, currency: GBP}
+        - {name: Feather Duvet - Super King, price: 34.50, currency: GBP}
+        - {name: Mattress Topper - Super King/Double Layer, price: 50.00, currency: GBP}
+    - service: Separate Wash & Fold
+      short_code: separate_wash
+      basis: weight
+    - service: Repairs
+      short_code: repairs
+      basis: quoted
+      turnaround: 3 day service
+
+commercial_terms:
+  delivery: Free delivery, stated across the site.
+  turnaround: 24 hours standard; 72 hours for duvets, bulky items and repairs.
+  in_product_commerce:
+    note: >-
+      The GraphQL surface carries credits, bundles, subscriptions and promo
+      codes (buyCredits, purchaseBundle, bundleGroups, createSubscription,
+      redeemSubscriptionCode, applyPromoCode), so a subscription/credit product
+      exists — but no page publishes its tiers or prices, so nothing is recorded
+      for it here.
+  payment_processor: Stripe (stripePublishableKey query, createSetupIntent, attachPaymentMethod)
+
+x-evidence:
+  fetched: '2026-08-23'
+  probes:
+    - url: https://www.laundryheap.com/en-gb/pricing
+      status: 200
+    - url: https://www.laundryheap.com/en-gb/pricing/wash/pricelist
+      status: 200
+    - url: https://www.laundryheap.com/en-gb/pricing/dry-cleaning/pricelist
+      status: 200
+    - url: https://www.laundryheap.com/en-gb/subscriptions
+      status: 200
+      note: soft-404 to homepage

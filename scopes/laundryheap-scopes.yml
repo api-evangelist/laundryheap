@@ -1,0 +1,55 @@
+generated: '2026-08-23'
+method: probed
+source: >-
+  https://www.laundryheap.com/.well-known/openid-configuration — scopes_supported,
+  fetched live 2026-08-23 (HTTP 200).
+description: >-
+  The complete OAuth 2.0 scope surface Laundryheap's authorization server
+  advertises. There are two scopes and no published scope reference page: this
+  list is the authorization server's own machine-readable declaration, which is
+  the only place either scope is named anywhere on Laundryheap's public surface.
+docs: null
+docs_note: >-
+  No scopes/permissions reference page exists. Searched the website, the help
+  centre (help.laundryheap.com) and the partner/hotel pages; none mention OAuth,
+  scopes, API access or client credentials.
+
+authorization_server: https://www.laundryheap.com
+authorization_url: https://www.laundryheap.com/oauth/authorize
+token_url: https://www.laundryheap.com/oauth/token
+grant_types: [authorization_code, client_credentials]
+
+scope_count: 2
+scopes:
+  - name: openid
+    description: >-
+      Standard OpenID Connect scope. Requests an ID token (RS256) identifying the
+      end user; enables the /oauth/userinfo endpoint.
+    standard: true
+    spec: OpenID Connect Core 1.0
+  - name: orders.create
+    description: >-
+      Create orders on behalf of the account. Laundryheap's only business scope.
+      Its dotted resource.action naming implies a wider intended scheme
+      (orders.read, orders.cancel and so on) of which only this one is currently
+      advertised.
+    standard: false
+    resource: orders
+    action: create
+    write: true
+
+observations:
+  - >-
+    The scope set is write-only in business terms: a partner can create an order
+    but the authorization server advertises no scope for reading, modifying or
+    cancelling one. Every read and every cancellation observed on the GraphQL
+    surface is gated behind the first-party session instead.
+  - >-
+    Dynamic client registration (RFC 7591) is open at /oauth/registration, so
+    scopes can be requested by a self-registered client.
+
+x-evidence:
+  fetched: '2026-08-23'
+  url: https://www.laundryheap.com/.well-known/openid-configuration
+  http_status: 200
+  scopes_supported: [openid, orders.create]

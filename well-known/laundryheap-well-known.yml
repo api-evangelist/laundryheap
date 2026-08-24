@@ -1,0 +1,96 @@
+generated: '2026-08-23'
+method: searched
+source: >-
+  Live unauthenticated probes of /.well-known/* on every Laundryheap host found
+  in apis.yml and in the production web-app bundle. www.laundryheap.com serves a
+  real RFC 8414 / OpenID Connect Discovery document; app.laundryheap.com is a
+  single-page-app catch-all that answers 200 for every path and is recorded as a
+  miss.
+description: >-
+  Laundryheap's /.well-known/ discovery surface. The find here is a genuine
+  OAuth 2.0 Authorization Server Metadata document (RFC 8414) and OpenID Connect
+  Discovery document served from the company's own root host, advertising an
+  `orders.create` scope — machine-readable evidence of a partner ordering API
+  that is documented nowhere on the public developer surface.
+
+hosts:
+  - host: https://www.laundryheap.com
+    documents:
+      - path: /.well-known/openid-configuration
+        status: 200
+        file: laundryheap-openid-configuration.json
+        note: >-
+          OpenID Connect Discovery 1.0. issuer https://www.laundryheap.com,
+          RS256 id tokens, PKCE S256, authorization_code + client_credentials.
+      - path: /.well-known/oauth-authorization-server
+        status: 200
+        file: laundryheap-oauth-authorization-server.json
+        note: >-
+          RFC 8414 OAuth 2.0 Authorization Server Metadata. Byte-identical to the
+          OIDC document above.
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/oauth-protected-resource
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+
+  - host: https://admin.laundryheap.com
+    documents:
+      - path: /.well-known/openid-configuration
+        status: 200
+        note: >-
+          Same authorization server, endpoints re-pointed at the admin host while
+          keeping issuer https://www.laundryheap.com. Not saved separately — it
+          differs from the www document only in the endpoint host.
+      - path: /.well-known/oauth-authorization-server
+        status: 200
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+
+  - host: https://app.laundryheap.com
+    hit_count: 0
+    documents: []
+    note: >-
+      SPA catch-all. Every probed path — including the negative control
+      /.well-known/this-should-not-exist-xyz — returned HTTP 200 with the same
+      5,876-byte HTML shell. No document is recorded for this host and no
+      pointer is emitted from it.
+
+soft_404_control:
+  www.laundryheap.com:
+    path: /.well-known/this-should-not-exist-xyz
+    status: 404
+    bytes: 3033
+    verdict: host distinguishes real documents from misses; 200s above are trustworthy
+  app.laundryheap.com:
+    path: /.well-known/this-should-not-exist-xyz
+    status: 200
+    bytes: 5876
+    verdict: catch-all; all 200s on this host are meaningless
+
+additional_documents:
+  - path: /oauth/discovery/keys
+    host: https://www.laundryheap.com
+    status: 200
+    file: laundryheap-jwks.json
+    note: >-
+      JWKS referenced by jwks_uri in the discovery document. A single RS256
+      signing key. Not under /.well-known/, so it is recorded here rather than in
+      hosts[].documents[].
+
+x-evidence:
+  fetched: '2026-08-23'
+  hit_count: 2

@@ -1,0 +1,29 @@
+generated: '2026-08-23'
+method: generated
+source: >-
+  graphql/laundryheap-graphql.yml (fields extracted from
+  https://app.laundryheap.com/assets/index-BQ9DuQOF.js) and the Laundryheap Help
+  Centre at https://help.laundryheap.com/.
+description: >-
+  Packaged Agent Skills for Laundryheap's GraphQL API. Laundryheap publishes no
+  developer documentation, so these are grounded in the operation set extracted
+  from the company's own production client bundle and cross-checked against the
+  live endpoint. Every field and argument named in them is real; return shapes
+  are deliberately left unspecified because no schema is published.
+caveat: >-
+  Laundryheap publishes no process for obtaining API credentials. These skills
+  describe a surface that is real and reachable but not openly available.
+skills:
+  - name: laundryheap-book-order
+    file: laundryheap-book-order.md
+    description: Resolve a serviceable address, pick services and windows, and create an order.
+    operations: [validateAddressWithMappedCity, services, getPaymentInfo, timeslotsV2, createAddress, createGuestUser, createOrder, applyPromoCode]
+    write: true
+    reversible: true
+  - name: laundryheap-manage-order
+    file: laundryheap-manage-order.md
+    description: Inspect, reschedule and cancel orders and recurring orders, respecting the 2-hour cancellation window.
+    operations: [ordersV2, order, modifyOrder, updateOrderServices, cancelOrder, getPaymentPolicy, sendInvoiceMail, repeatOrders, repeatOrder, repeatOrderTimeslots, repeatOrderUpdate, repeatOrderUpdateSchedule, repeatOrderDelete]
+    write: true
+    reversible: partial
+skill_count: 2

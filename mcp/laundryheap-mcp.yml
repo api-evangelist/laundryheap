@@ -1,0 +1,119 @@
+generated: '2026-08-23'
+method: derived
+status: candidate
+source: >-
+  graphql/laundryheap-graphql.yml — a candidate tool surface derived from
+  Laundryheap's real GraphQL fields. Laundryheap ships no MCP server.
+description: >-
+  Laundryheap publishes no MCP server of any kind — no hosted endpoint, no stdio
+  package, nothing in any MCP registry or on npm/PyPI. This file records a
+  CANDIDATE tool surface derived from the GraphQL fields the company already
+  exposes, so the gap is legible and actionable. It is not a claim that any of
+  this exists, and no `MCPServer` pointer is emitted in apis.yml for it.
+
+deployment:
+  mode: none
+  endpoint: null
+  install: null
+  package: null
+  auth: unknown
+  verified: derived
+  note: >-
+    Searched npm (registry + full-text search), PyPI, RubyGems, Packagist and the
+    GitHub organisation github.com/laundryheap (which exists but has zero public
+    repositories). Probed every Laundryheap host for an MCP endpoint. Nothing.
+    No endpoint URL has been invented here.
+
+search_evidence:
+  - {registry: npm, query: laundryheap, results: 0}
+  - {registry: pypi, package: laundryheap, status: 404}
+  - {registry: rubygems, query: laundryheap, results: 0}
+  - {registry: packagist, query: laundryheap, results: 0}
+  - {host: 'github.com/laundryheap', status: 200, public_repos: 0}
+
+readiness:
+  auth_ready: true
+  auth_note: >-
+    Unusually well positioned for an MCP server despite shipping none. The
+    company already runs an OAuth 2.0 authorization server with PKCE, dynamic
+    client registration (RFC 7591) and protected-resource semantics — the exact
+    identity substrate the MCP authorization spec builds on. The missing pieces
+    are the server and the /.well-known/oauth-protected-resource document
+    (currently 404).
+  blockers:
+    - No published schema (GraphQL introspection disabled), so tool inputSchemas
+      cannot be generated automatically.
+    - Only one business scope (orders.create); read and cancel tools would have
+      no scope to bind to.
+
+candidate_tools:
+  - name: list_services
+    description: List the laundry and dry-cleaning services available at an address.
+    source_field: 'query services(serviceCountry, latitude, longitude, onlyExpress)'
+    also_available_as: GET /api/v1/services?address= (unauthenticated, live)
+    consequence: read
+  - name: list_timeslots
+    description: List available pickup and dropoff time windows for a set of services.
+    source_field: 'query timeslotsV2(type, pickupAfterTime, pickupBeforeTime, dropoffAfterTime, dropoffBeforeTime, serviceIds)'
+    consequence: read
+  - name: validate_address
+    description: Validate a latitude/longitude against Laundryheap's serviceable city map.
+    source_field: 'mutation validateAddressWithMappedCity(latitude!, longitude!, serviceCountry)'
+    consequence: read
+  - name: list_addresses
+    description: List the authenticated account's saved addresses.
+    source_field: query addresses
+    consequence: read
+  - name: create_address
+    description: Save a geocoded delivery address on the account.
+    source_field: 'mutation createAddress(countryCode!, latitude!, longitude!, city, country, isDefault)'
+    consequence: write
+  - name: get_price_estimate
+    description: Retrieve the payment information and estimate for a prospective order.
+    source_field: 'query getPaymentInfo(serviceCountry!, addressID, lat, lng, addressType, udprn)'
+    consequence: read
+  - name: create_order
+    description: Book a laundry collection and delivery.
+    source_field: 'mutation createOrder(pickupAfterDateTime!, pickupBeforeDateTime!, dropOffAfterDateTime!, dropOffBeforeDateTime!, ...)'
+    consequence: write
+    reversible: true
+    reversal: cancel_order within 2 hours of collection at no cost
+    scope: orders.create
+  - name: modify_order
+    description: Change the pickup or dropoff window on an existing order.
+    source_field: 'mutation modifyOrder(uuid, pickupAfterDateTime, pickupBeforeDateTime, dropOffAfterDateTime, dropOffBeforeDateTime)'
+    consequence: write
+  - name: cancel_order
+    description: Cancel an order, with structured reasons.
+    source_field: 'mutation cancelOrder(uuid, reasons)'
+    consequence: write
+    reversible: false
+    window: free up to 2 hours before collection; a fee applies inside that window
+  - name: list_orders
+    description: List the account's orders, filtered by state and paginated.
+    source_field: 'query ordersV2(page, perPage, sortBy, sortDirection, state!)'
+    consequence: read
+  - name: get_order
+    description: Retrieve a single order by uuid.
+    source_field: 'query order(uuid!)'
+    consequence: read
+  - name: list_hotels
+    description: List Laundryheap partner hotels in a service country.
+    source_field: 'query hotels(serviceCountry!, filter)'
+    consequence: read
+  - name: apply_promo_code
+    description: Apply a promotional code to an order.
+    source_field: 'mutation applyPromoCode(uuid!, promoCode!)'
+    consequence: write
+    reversible: true
+    reversal: removePromoCode
+
+candidate_tool_count: 13
+input_schemas: >-
+  NOT derivable. GraphQL introspection is disabled and no schema is published, so
+  the argument types above are the complete input contract that can be
+  established from public evidence. Real inputSchemas would require either
+  introspection being enabled or a published schema.
+
+x-evidence:
+  fetched: '2026-08-23'

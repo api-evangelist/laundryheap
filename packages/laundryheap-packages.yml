@@ -1,0 +1,86 @@
+generated: '2026-08-23'
+method: searched
+source: >-
+  Direct lookups against registry.npmjs.org (including full-text search),
+  pypi.org, rubygems.org, packagist.org and api.github.com on 2026-08-23.
+description: >-
+  Laundryheap publishes no client libraries in any public package registry. This
+  is a recorded absence, not an unchecked one — every registry below was queried
+  and answered.
+package_count: 0
+official_package_count: 0
+packages: []
+
+registry_probes:
+  - registry: npm
+    query: laundryheap
+    endpoint: https://registry.npmjs.org/-/v1/search?text=laundryheap
+    total: 0
+    version: null
+    published: null
+    note: Full-text search returned zero packages. Direct lookups for laundryheap, @laundryheap/sdk, laundryheap-api and laundryheap-sdk all returned 404.
+  - registry: pypi
+    query: laundryheap
+    endpoint: https://pypi.org/pypi/laundryheap/json
+    status: 404
+    version: null
+    published: null
+  - registry: rubygems
+    query: laundryheap
+    endpoint: https://rubygems.org/api/v1/search.json?query=laundryheap
+    total: 0
+    version: null
+    published: null
+    note: >-
+      Worth noting because the platform is itself Ruby on Rails (Doorkeeper OAuth,
+      graphql-ruby, Rails session cookies, x-runtime). The company builds in Ruby
+      and ships no gem.
+  - registry: packagist
+    query: laundryheap
+    endpoint: https://packagist.org/search.json?q=laundryheap
+    total: 0
+    version: null
+    published: null
+  - registry: maven-central
+    queried: false
+    note: Not queried — no JVM surface is implied anywhere on the provider's public material.
+  - registry: nuget
+    queried: false
+    note: Not queried — no .NET surface implied.
+  - registry: go-modules
+    queried: false
+    note: Not queried — no Go surface implied.
+  - registry: crates.io
+    queried: false
+    note: Not queried — no Rust surface implied.
+
+github:
+  organization: https://github.com/laundryheap
+  status: 200
+  type: Organization
+  public_repos: 0
+  bio: Laundry today or naked tomorrow
+  location: United Kingdom
+  note: >-
+    The organisation is real and claimed (it links to www.laundryheap.com) but
+    holds zero public repositories. There is no SDK, no sample code and no
+    published spec on it.
+  third_party_repos_note: >-
+    GitHub search for "laundryheap" returns 5 repositories, none owned by the
+    company — they are student projects and clones. None is a client library and
+    none is recorded here.
+
+distribution:
+  note: >-
+    Laundryheap ships consumer mobile apps (iOS and Android) and a web app at
+    app.laundryheap.com. These are end-user products, not client libraries, and
+    are deliberately NOT recorded as packages or SDKs — an app a customer
+    installs is not something an integrator can call.
+
+gaps:
+  - No first-party SDK in any language.
+  - No sample code or reference client on the GitHub organisation.
+  - No `SDKs` pointer is emitted in apis.yml, because there is no SDK to point at.
+
+x-evidence:
+  fetched: '2026-08-23'

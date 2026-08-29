@@ -14,6 +14,17 @@ description: >-
   production GraphQL API of 69 fields and a small unauthenticated JSON endpoint
   that returns its service catalogue. The API surface is real and substantial;
   what is missing is any documentation of it.
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: false
+  label: Hosted service · you call their endpoint
+  confidence: medium
+  source:
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 image: https://prod-cdn.laundryheap.com/images/static/og_image.jpg
 url: https://raw.githubusercontent.com/api-evangelist/laundryheap/refs/heads/main/apis.yml
 x-type: company

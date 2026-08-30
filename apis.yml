@@ -43,6 +43,18 @@ tags:
 - Hospitality
 - Ordering
 - GraphQL
+- Authentication
+tags_raw:
+- Company
+- Laundry
+- Dry Cleaning
+- On-Demand Services
+- Logistics
+- Last Mile Delivery
+- Consumer Services
+- Hospitality
+- Ordering
+- GraphQL
 - OAuth
 maintainers:
 - FN: Kin Lane
@@ -84,6 +96,9 @@ apis:
   humanURL: https://www.laundryheap.com/.well-known/openid-configuration
   baseURL: https://www.laundryheap.com/oauth
   tags:
+  - Authentication
+  - OpenID Connect
+  tags_raw:
   - OAuth
   - OpenID Connect
   - Authentication

@@ -64,5 +64,117 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Laundryheap is a company surfaced via the API Evangelist harvest backlog (source: secondary-market) and added to the network as a stub for full-pipeline profiling.
-- https://www.hiive.com/securities/laundryheap-stock
+Laundryheap is a London-founded on-demand laundry and dry-cleaning company that collects, cleans and returns clothing within 24 hours, operating across the United Kingdom, United States, Ireland, the Netherlands, Sweden, Denmark, the UAE, Qatar, Kuwait, Bahrain and Singapore. It serves consumers directly through iOS, Android and web apps, and businesses through hotel-affiliate, commercial laundry and dry-cleaning partner programmes. Laundryheap operates no developer portal and publishes no API documentation, but it does run a real, live, standards-clean OAuth 2.0 and OpenID Connect authorization server on its own root host — complete with PKCE, token introspection, token revocation and open dynamic client registration — advertising an `orders.create` scope, alongside a production GraphQL API of 69 fields and a small unauthenticated JSON endpoint that returns its service catalogue. The API surface is real and substantial; what is missing is any documentation of it.
+
+**Areas:** Company · Laundry · Dry Cleaning · On-Demand Services · Logistics · Last Mile Delivery · Consumer Services · Hospitality · Ordering · GraphQL · Authentication
+
+## Laundryheap on APIs.io
+
+Everything profiled for Laundryheap is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/laundryheap/](https://apis.io/providers/laundryheap/)** — or go straight to one of the APIs or properties below.
+
+### APIs (3)
+
+- [Laundryheap GraphQL API](https://apis.io/apis/laundryheap/laundryheap-graphql-api/) — Laundryheap's primary product API. A single GraphQL endpoint serving the consumer web and mobile apps, covering ordering, recurring orders, addresses,…
+- [Laundryheap OAuth 2.0 / OpenID Connect Authorization Server](https://apis.io/apis/laundryheap/laundryheap-oauth-20-openid-connect-authorization-server/) — A live, spec-clean OAuth 2.0 and OpenID Connect provider on Laundryheap's root host, discovered only by probing /.well-known/. It advertises the…
+- [Laundryheap Service Catalogue API](https://apis.io/apis/laundryheap/laundryheap-service-catalogue-api/) — A small unauthenticated JSON endpoint under /api/v1 that returns the laundry and dry-cleaning services available at a given address, with each service's…
+
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### MCP servers (1)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [laundryheap-mcp.yml](https://apis.io/servers/laundryheap/laundryheap-mcp-yml/)
+
+#### Security (2)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Laundryheap Authentication](https://apis.io/security/laundryheap/laundryheap-authentication/)
+- [Laundryheap Domain Security](https://apis.io/security/laundryheap/laundryheap-domain-security/)
+
+#### OAuth scopes (1)
+
+The permissions the API asks for.
+
+- [Laundryheap Scopes](https://apis.io/scopes/laundryheap/laundryheap-scopes/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Laundryheap Plans Pricing](https://apis.io/plans/laundryheap/laundryheap-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Laundryheap Rate Limits](https://apis.io/rate-limits/laundryheap/laundryheap-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://www.laundryheap.com/)
+- [Pricing](https://www.laundryheap.com/en-gb/pricing)
+- [Sign up](https://app.laundryheap.com/)
+- [Support](https://help.laundryheap.com/en/)
+- [Blog](https://www.laundryheap.com/blog/)
+- [Terms of service](https://www.laundryheap.com/en-us/terms)
+- [Privacy policy](https://www.laundryheap.com/privacy)
+- [GitHub](https://github.com/laundryheap)
+
+## API Evangelist rating
+
+**Kin Score 24.6** — emerging · rubric 0.24.0 · scored 2026-10-17
+
+| Facet | Score |
+|---|---|
+| Discoverability | 71.4 |
+| Contract quality | 6.5 |
+| Contract governance | 18.2 |
+| Operational transparency | 2.6 |
+| Developer ergonomics | 20.8 |
+| Access clarity | 31.6 |
+
+**Agent readiness 22.7** — agent-aware
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | — |
+| Agentic Access | — |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | served (partial credit) |
+| Idempotency | — |
+| Error Semantics | documented (partial credit) |
+| OpenAPI Examples | documented (partial credit) |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | — |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | served (partial credit) |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | yes |
+| Agentic Commerce | — |
+
+**Regulatory alignment 34.3** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/laundryheap/](https://apis.io/providers/laundryheap/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Laundryheap: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/laundryheap/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
